@@ -15,16 +15,25 @@ This three-day course equips data scientists and data engineers to extend their 
 
 ## Getting Started
 
-To get started with this course, you'll need to have Node.js and Python installed on your machine.
+To get started with this course, you'll need to have Python (version 3.11 or higher recommended) and Node.js installed on your machine.
 
 1.  **Clone the repository:**
     ```bash
     git clone https://git.generalassemb.ly/modular-curriculum-all-courses/uber-ai-superpowered-data.git
     ```
-2.  **Install dependencies:**
+2.  **Set up Python environment:**
+    It's highly recommended to use a virtual environment to manage your Python dependencies.
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    pip install -r requirements.txt
+    ```
+3.  **Install Node.js dependencies:**
     ```bash
     npm install
     ```
+4.  **Configure API Keys (if applicable):**
+    Some modules may require API keys for services like OpenAI. Please refer to individual module instructions for details on how to set these up (e.g., via environment variables in a `.env` file).
 
 ## Course Schedule
 
@@ -60,8 +69,8 @@ To get started with this course, you'll need to have Node.js and Python installe
 | -------------------------------------------- | ------------------ | ------------------ | ------------------------------------------------------------------------------ |
 | Warm up Activities                           | -                  | 30 min             | Overview of day's lessons and content review                                   |
 | [Multi-Agent Systems & Orchestration](./multi-agent-systems-and-orchestration-techniques) | Lecture            | 60 min             | Explore orchestration patterns, state management, context sharing, and error handling. |
-| Lab - Build the Compliance Reviewer Agent    | Walkthrough/Lab    | 120 min            | Build and integrate a second agent to create a complete, functioning system.   |
-| Lab - Upgrading to LangGraph                 | Walkthrough/Lab    | 120 min            | Create evaluation plans, define success metrics, and trace system errors.      |
+| [Lab - Build the Compliance Reviewer Agent](./building-agent-2-and-initial-integration) | Walkthrough/Lab    | 120 min            | Build and integrate a second agent to create a complete, functioning system.   |
+| [Lab - Upgrading to LangGraph](./lab-orchestrating-and-evaluating-the-sox-copilot) | Walkthrough/Lab    | 120 min            | Create evaluation plans, define success metrics, and trace system errors.      |
 | [Lab — Refining the SOX Audit Copilot](./lab-refining-the-SOX-audit-copilot) | Lab                | 120 min            | Test, debug, and refine the complete two-agent system.                         |
 | Lab & Course Wrap up                         | -                  | 30 min             | Module summary activities.                                                     |
 | **Total content**                            |                    | **7 total course hours** |                                                                                |
@@ -85,4 +94,28 @@ This repository is organized into modules, each in its own directory. Here is an
 ├── multi-agent-systems-and-orchestration-techniques
 ├── scoring-and-validation-w-llms
 └── task-decomposition-for-ai-agents
+
+## Module Structure
+
+Each module in this repository follows a consistent structure to help you navigate the content:
+
+*   `README.md`: Provides an overview of the module, learning objectives, and key concepts.
+*   `assets/`: Contains images and other static assets used in the module.
+*   `solution/`: Contains the completed code and solutions for the labs and exercises.
+*   `starter/`: Contains starter code for the labs and exercises, where applicable.
+*   Other directories: May contain additional lecture materials, notebooks, or specific lab components.
+
+## Labs Overview
+
+Here is a consolidated list of all the labs in this course:
+
+*   **Day 1:**
+    *   [Task Decomposition](./task-decomposition-for-ai-agents)
+    *   [Scoring and Validation w/ LLMs](./scoring-and-validation-w-llms)
+*   **Day 2:**
+    *   [Lab - Implementing RAG](./lab-implementing-rag)
+*   **Day 3:**
+    *   [Lab - Build the Compliance Reviewer Agent](./building-agent-2-and-initial-integration)
+    *   [Lab - Upgrading to LangGraph](./lab-orchestrating-and-evaluating-the-sox-copilot)
+    *   [Lab — Refining the SOX Audit Copilot](./lab-refining-the-sox-audit-copilot)
 '''
