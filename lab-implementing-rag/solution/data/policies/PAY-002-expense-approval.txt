@@ -1,0 +1,22 @@
+PAY-002: Expense Approval Policy
+
+Effective Date: January 1, 2024
+
+1. Purpose
+This policy establishes approval thresholds for business expenses.
+
+2. Single Approval (Under $10,000)
+Expenses under $10,000 require approval from one of:
+- Direct manager
+- Department head
+
+3. Dual Approval ($10,000 and above)
+Expenses of $10,000 or more require approval from BOTH:
+- Department head
+- Finance officer
+
+4. Documentation Requirements
+All expenses must include:
+- Itemized receipt
+- Business justification
+- Project code (if applicable)

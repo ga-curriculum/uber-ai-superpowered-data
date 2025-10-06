@@ -1,0 +1,8 @@
+entry_id,date,account,amount,approver_1,approver_2,notes
+1001,2024-07-01,Accounts Payable,500,j.smith,a.lee,Office supplies
+1002,2024-07-02,Accounts Payable,2500,j.smith,,Laptop purchase (missing approver_2)
+1003,2024-07-03,Accounts Payable,1500,,a.lee,Travel reimbursement (missing approver_1)
+1004,2024-07-04,Accounts Payable,3000,j.smith,j.smith,Vendor invoice (approvers not distinct - edge case)
+1005,2024-07-05,Revenue,5000,j.smith,,Ride revenue batch (wrong control type)
+1006,2024-07-06,Accounts Payable,750,a.lee,,"Catering (below threshold, missing approver_2 OK)"
+1007,2024-07-07,Accounts Payable,2000,a.lee,b.khan,Consulting services (clean)

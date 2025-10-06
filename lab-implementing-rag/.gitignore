@@ -1,0 +1,47 @@
+# Environment variables (contains API keys)
+.env
+*.env
+
+# Generated logs and outputs
+runs/*
+*.jsonl
+
+# Vector store databases (generated)
+chroma_db/*
+!chroma_db/.keep
+*.bin
+*.faiss
+*.sqlite3
+*.pkl
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+starter/Pipfile.lock

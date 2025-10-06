@@ -1,0 +1,16 @@
+SEC-001: Data Classification Policy
+
+Effective Date: March 15, 2024
+
+1. Classification Levels
+
+Public: Information that can be freely shared.
+Internal: Information for employees only.
+Confidential: Sensitive business information requiring protection.
+Restricted: Highly sensitive data (PII, financial records, trade secrets).
+
+2. Handling Confidential Data
+- Encrypt at rest and in transit
+- Access on need-to-know basis only
+- Log all access attempts
+- Report breaches within 24 hours to security@company.com

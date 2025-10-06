@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+langchain = "~=0.3.0"
+langchain-openai = "~=0.2.0"
+langchain-core = "~=0.3.0"
+langgraph = "~=0.2.0"
+pydantic = "~=2.9.0"
+pandas = "~=2.2.0"
+python-dotenv = "~=1.0.0"
+openai = "~=1.55.0"
+jupyter = "*"
+
+[dev-packages]
+jupyter = "*"
+ipykernel = "*"
+
+[requires]
+python_version = "3.11"
