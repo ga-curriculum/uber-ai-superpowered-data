@@ -1,7 +1,7 @@
 <h1>
   <span>
 
-  ![alt text](./assets/ga-logo.png)
+  ![alt text](/assets/ga-logo.png)
 
   </span>
   <span class="subhead">Part 4 - Run, Log, and Reflect</span>

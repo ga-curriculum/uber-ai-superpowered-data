@@ -1,7 +1,7 @@
 <h1>
   <span class="prefix">
 
-  ![](./assets/ga-logo.png)
+  ![](/assets/ga-logo.png)
 
   </span> 
   <span class="headline">Multi-Agent Systems and Orchestration Techniques</span>

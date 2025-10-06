@@ -1,6 +1,6 @@
 <span>
 
-  ![alt text](./assets/ga-logo.png)
+  ![alt text](/assets/ga-logo.png)
 
 </span>
 

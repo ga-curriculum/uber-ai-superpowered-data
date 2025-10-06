@@ -2,7 +2,7 @@
 <h1>
   <span style="display:flex; gap:20px; text-align:middler; font-size:">
 
-  ![](./assets/ga-logo.png)
+  ![](/assets/ga-logo.png)
 
   </span> 
   <span class="headline">Develop a Single-Agent System</span>

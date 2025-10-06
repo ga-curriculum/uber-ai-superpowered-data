@@ -1,7 +1,7 @@
 {
-  "name": "tktk-module-name",
+  "name": "uber-ai-superpowered-data-professionals",
   "version": "1.0.0",
-  "description": "",
+  "description": "A three-day course for data scientists and data engineers to extend their AI/ML practice into principled, production-ready agentic systems.",
   "scripts": {
     "mdv": "node md-validate.js"
   },

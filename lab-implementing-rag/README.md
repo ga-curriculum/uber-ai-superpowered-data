@@ -2,7 +2,7 @@
 
   <span class="prefix">
 
-  ![](./assets/ga-logo.png)
+  ![](/assets/ga-logo.png)
 
   </span> 
 
