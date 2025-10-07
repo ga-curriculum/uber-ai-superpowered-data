@@ -136,13 +136,6 @@ Use this table as a quick reference guide:
 5. SOX compliance requires reproducible evidence. Your SQL queries and validation logs are what auditors test, not your LLM summaries.
 6. Fail-closed design prevents bad data from propagating. If validation fails, stop the workflow and alert humans.
 
-**Aha Moments**
-
-- The LLM is a prosecutor, not a detective. It interprets evidence but does not collect it.
-- Temperature is a risk dial. Higher temperature increases hallucination risk.
-- Same facts, different words do not mean different facts. LLM variance in phrasing is acceptable; variance in numbers is not.
-- Schema enforcement is your firewall. Invalid data should never reach the LLM.
-
 ---
 
 ## Reflection & Discussion Questions
