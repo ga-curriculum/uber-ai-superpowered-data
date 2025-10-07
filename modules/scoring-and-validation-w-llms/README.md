@@ -20,7 +20,7 @@ This module addresses the critical challenge: "How do we know if the LLM's outpu
 
 | Lesson                                                                            | Est. Delivery Time | Learning Objective                                                                                           |
 | --------------------------------------------------------------------------------- | :----------------: | ------------------------------------------------------------------------------------------------------------ |
-|  History of AI Evaluation and Importance                  |         --         | Explain the history of AI validation and why validation is essential for compliance-oriented development.    |
+|  [History of AI Evaluation and Importance](./concepts/README.md)                  |         --         | Explain the history of AI validation and why validation is essential for compliance-oriented development.    |
 | [Programmatic Validation](./implement-automated-scoring/README.md)                |         --         | Apply automated checks to test LLM outputs for accuracy and formatting.                                      |
 | [Human Rubrics & Hybrid Evaluation](./human-centered-rubrics/README.md)           |         --         | Explain the core narratives and requirements for SOX compliant validation. Evaluate Human Rubric case-study. |
 | [Lab: Evaluating Readiness for Production](./lab-evaluating-production/README.md) |         --         | Integrate automated scores with human feedback to judge whether an AI system is production-ready.            |
