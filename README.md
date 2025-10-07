@@ -75,25 +75,6 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | Lab & Course Wrap up                         | -                  | 30 min             | Module summary activities.                                                     |
 | **Total content**                            |                    | **7 total course hours** |                                                                                |
 
-## Directory Structure
-
-This repository is organized into modules, each in its own directory. Here is an overview of the directory structure:
-
-'''
-.
-├── ai-compliance-and-risk-management-sox
-├── agent-architecture-understanding-agents-and-their-capabilities
-├── building-agent-2-and-initial-integration
-├── cursor-best-practices
-├── develop-a-single-agent-system
-├── lab-implementing-rag
-├── lab-orchestrating-and-evaluating-the-sox-copilot
-├── lab-refining-the-SOX-audit-copilot
-├── LESSON-TEMPLATE
-├── mindset-shift-deterministic-vs-probabilistic-systems
-├── multi-agent-systems-and-orchestration-techniques
-├── scoring-and-validation-w-llms
-└── task-decomposition-for-ai-agents
 
 ## Module Structure
 
