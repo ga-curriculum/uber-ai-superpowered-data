@@ -27,4 +27,4 @@ This module introduces the key architectural patterns for single AI agents. Lear
 
 <!-- ## References
 
-📖 [Reference Materials](./references/README.md) -->
+📖 Reference Materials -->

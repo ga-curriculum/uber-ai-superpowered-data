@@ -27,5 +27,5 @@ This module examines how AI intersects with SOX compliance. This module discusse
 
 ## References
 
-📖 [Reference Materials](./references/README.md)
+📖 Reference Materials
 
