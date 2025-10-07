@@ -42,12 +42,12 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | Module                                                              | Type               | Est. Delivery Time | About                                                                                      |
 | ------------------------------------------------------------------- | ------------------ | ------------------ | ------------------------------------------------------------------------------------------ |
 | Ice-breakers & Warm up Activities                                   | -                  | 30 min             | Orientation & module framing content                                                       |
-| [AI Compliance & Risk Management (SOX)](./ai-compliance-and-risk-management-sox) | Lecture            | 60 min             | Learn how SOX controls, data integrity, and auditability apply to AI systems.              |
-| [Mindset Shift: Deterministic vs. Probabilistic Systems](./mindset-shift-deterministic-vs-probabilistic-systems) | Lecture/Discussion | 60 min             | Contrast deterministic code with probabilistic AI, emphasizing a reliability mindset when “steering” models. |
-| [Cursor Best Practices](./cursor-best-practices)                      | Lecture/Workshop   | 60 min             | Leverage Cursor for AI-assisted coding, refactoring, debugging, and workflow best practices. |
-| [Agent Architecture: Understanding Agents & Their Capabilities](./agent-architecture-understanding-agents-and-their-capabilities) | Lecture            | 30 min             | Explore agent design patterns through scenarios, matching architecture to business needs.      |
-| [Task Decomposition](./task-decomposition-for-ai-agents)              | Lecture/Lab        | 30 min             | Break down complex problems into agent-ready tasks, comparing good vs poor approaches.     |
-| [Scoring and Validation w/ LLMs](./scoring-and-validation-w-llms)     | Lecture/Workshop   | 120 min            | Combine automated checks and human rubrics to evaluate LLM outputs.                        |
+| [AI Compliance & Risk Management (SOX)](./modules/ai-compliance-and-risk-management-sox) | Lecture            | 60 min             | Learn how SOX controls, data integrity, and auditability apply to AI systems.              |
+| [Mindset Shift: Deterministic vs. Probabilistic Systems](./modules/mindset-shift-deterministic-vs-probabilistic-systems) | Lecture/Discussion | 60 min             | Contrast deterministic code with probabilistic AI, emphasizing a reliability mindset when “steering” models. |
+| [Cursor Best Practices](./modules/cursor-best-practices)                      | Lecture/Workshop   | 60 min             | Leverage Cursor for AI-assisted coding, refactoring, debugging, and workflow best practices. |
+| [Agent Architecture: Understanding Agents & Their Capabilities](./modules/agent-architecture-understanding-agents-and-their-capabilities) | Lecture            | 30 min             | Explore agent design patterns through scenarios, matching architecture to business needs.      |
+| [Task Decomposition](./modules/task-decomposition-for-ai-agents)              | Lecture/Lab        | 30 min             | Break down complex problems into agent-ready tasks, comparing good vs poor approaches.     |
+| [Scoring and Validation w/ LLMs](./modules/scoring-and-validation-w-llms)     | Lecture/Workshop   | 120 min            | Combine automated checks and human rubrics to evaluate LLM outputs.                        |
 | Lesson Wrap up                                                      | -                  | 30 min             | Module summary activities.                                                                 |
 | **Total content**                                                   |                    | **7 total course hours** |                                                                                            |
 
@@ -56,10 +56,10 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | Module                               | Type               | Est. Delivery Time | About                                                                          |
 | ------------------------------------ | ------------------ | ------------------ | ------------------------------------------------------------------------------ |
 | Warm up Activities                   | -                  | 30 min             | Overview of day's lessons and content review                                   |
-| [Intro to LangChain and LangGraph](./modules/lab-orchestrating-and-evaluating-the-sox-copilot) | Lecture/Workshop   | 90 min             | Apply LangGraph primitives to build auditable workflows with branching and classifiers. |
-| [Develop a Single-Agent System](./develop-a-single-agent-system) | Lecture/Walkthrough| 120 min            | Design, assemble, and test a complete agent that meets requirements and design choices. |
-| [Introduction to RAG](./modules/lab-implementing-rag) | Lecture/Walkthrough| 60 min             | Identify core components of a Retrieval-Augmented Generation system.           |
-| [Lab - Implementing RAG](./lab-implementing-rag) | Lab                | 90 min             | Implement and evaluate RAG pipelines.                                          |
+| [Intro to LangChain and LangGraph](./modules/modules/lab-orchestrating-and-evaluating-the-sox-copilot) | Lecture/Workshop   | 90 min             | Apply LangGraph primitives to build auditable workflows with branching and classifiers. |
+| [Develop a Single-Agent System](./modules/develop-a-single-agent-system) | Lecture/Walkthrough| 120 min            | Design, assemble, and test a complete agent that meets requirements and design choices. |
+| [Introduction to RAG](./modules/modules/lab-implementing-rag) | Lecture/Walkthrough| 60 min             | Identify core components of a Retrieval-Augmented Generation system.           |
+| [Lab - Implementing RAG](./modules/lab-implementing-rag) | Lab                | 90 min             | Implement and evaluate RAG pipelines.                                          |
 | Lesson Wrap up                       | -                  | 30 min             | Module summary activities.                                                     |
 | **Total content**                    |                    | **7 total course hours** |                                                                                |
 
@@ -68,10 +68,10 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | Module                                       | Type               | Est. Delivery Time | About                                                                          |
 | -------------------------------------------- | ------------------ | ------------------ | ------------------------------------------------------------------------------ |
 | Warm up Activities                           | -                  | 30 min             | Overview of day's lessons and content review                                   |
-| [Multi-Agent Systems & Orchestration](./multi-agent-systems-and-orchestration-techniques) | Lecture            | 60 min             | Explore orchestration patterns, state management, context sharing, and error handling. |
-| [Lab - Build the Compliance Reviewer Agent](./building-agent-2-and-initial-integration) | Walkthrough/Lab    | 120 min            | Build and integrate a second agent to create a complete, functioning system.   |
-| [Lab - Upgrading to LangGraph](./lab-orchestrating-and-evaluating-the-sox-copilot) | Walkthrough/Lab    | 120 min            | Create evaluation plans, define success metrics, and trace system errors.      |
-| [Lab — Refining the SOX Audit Copilot](./lab-refining-the-SOX-audit-copilot) | Lab                | 120 min            | Test, debug, and refine the complete two-agent system.                         |
+| [Multi-Agent Systems & Orchestration](./modules/multi-agent-systems-and-orchestration-techniques) | Lecture            | 60 min             | Explore orchestration patterns, state management, context sharing, and error handling. |
+| [Lab - Build the Compliance Reviewer Agent](./modules/building-agent-2-and-initial-integration) | Walkthrough/Lab    | 120 min            | Build and integrate a second agent to create a complete, functioning system.   |
+| [Lab - Upgrading to LangGraph](./modules/lab-orchestrating-and-evaluating-the-sox-copilot) | Walkthrough/Lab    | 120 min            | Create evaluation plans, define success metrics, and trace system errors.      |
+| [Lab — Refining the SOX Audit Copilot](./modules/lab-refining-the-SOX-audit-copilot) | Lab                | 120 min            | Test, debug, and refine the complete two-agent system.                         |
 | Lab & Course Wrap up                         | -                  | 30 min             | Module summary activities.                                                     |
 | **Total content**                            |                    | **7 total course hours** |                                                                                |
 
@@ -91,12 +91,12 @@ Each module in this repository follows a consistent structure to help you naviga
 Here is a consolidated list of all the labs in this course:
 
 *   **Day 1:**
-    *   [Task Decomposition](./task-decomposition-for-ai-agents)
-    *   [Scoring and Validation w/ LLMs](./scoring-and-validation-w-llms)
+    *   [Task Decomposition](./modules/task-decomposition-for-ai-agents)
+    *   [Scoring and Validation w/ LLMs](./modules/scoring-and-validation-w-llms)
 *   **Day 2:**
-    *   [Lab - Implementing RAG](./lab-implementing-rag)
+    *   [Lab - Implementing RAG](./modules/lab-implementing-rag)
 *   **Day 3:**
-    *   [Lab - Build the Compliance Reviewer Agent](./building-agent-2-and-initial-integration)
-    *   [Lab - Upgrading to LangGraph](./lab-orchestrating-and-evaluating-the-sox-copilot)
-    *   [Lab — Refining the SOX Audit Copilot](./lab-refining-the-sox-audit-copilot)
+    *   [Lab - Build the Compliance Reviewer Agent](./modules/building-agent-2-and-initial-integration)
+    *   [Lab - Upgrading to LangGraph](./modules/lab-orchestrating-and-evaluating-the-sox-copilot)
+    *   [Lab — Refining the SOX Audit Copilot](./modules/lab-refining-the-sox-audit-copilot)
 '''
