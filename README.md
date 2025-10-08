@@ -72,7 +72,7 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | [Multi-Agent Systems & Orchestration](./modules/multi-agent-systems-and-orchestration-techniques) | Lecture            | 60 min             | Explore orchestration patterns, state management, context sharing, and error handling. |
 | [Lab - Build the Compliance Reviewer Agent](./modules/building-agent-2-and-initial-integration) | Walkthrough/Lab    | 120 min            | Build and integrate a second agent to create a complete, functioning system.   |
 | [Lab - Upgrading to LangGraph](./modules/lab-orchestrating-and-evaluating-the-sox-copilot) | Walkthrough/Lab    | 120 min            | Create evaluation plans, define success metrics, and trace system errors.      |
-| [Lab — Refining the SOX Audit Copilot](./modules/lab-refining-the-SOX-audit-copilot) | Lab                | 120 min            | Test, debug, and refine the complete two-agent system.                         |
+| [Lab — Refining the SOX Audit Copilot](./modules/lab-refining-the-sox-audit-copilot) | Lab                | 120 min            | Test, debug, and refine the complete two-agent system.                         |
 | Lab & Course Wrap up                         | -                  | 30 min             | Module summary activities.                                                     |
 | **Total content**                            |                    | **7 total course hours** |                                                                                |
 
