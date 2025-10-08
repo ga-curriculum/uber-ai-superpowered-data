@@ -94,11 +94,14 @@ rag-lab/
 └── lab.py (your code goes here)
 ```
 
-**How to Use This Lab:**
+## Lab Structure
 
 This lab is divided into 4 parts that build on each other. You'll write all your code in a single `lab.py` file, adding to it as you progress through each part. By the end, you'll have a complete RAG system!
 
-1. **Part 1**: Load documents and build a vector store
-2. **Part 2**: Add answer generation with an LLM
-3. **Part 3**: Wrap everything in LangGraph with guardrails
-4. **Part 4**: Test, log, and reflect
+| Part                             | Learning Objective                                                           |
+| -------------------------------- | ---------------------------------------------------------------------------- |
+| [Part 1](./part-1.md)            | Load documents and build a vector store                                      |
+| [Part 2](./part-2.md)            | Add answer generation with an LLM                                            |
+| [Part 3](./part-3.md)            | Wrap everything in LangGraph with guardrails                                 |
+| [Part 4](./part-4.md)            | Test, log, and reflect                                                       |
+| [Stretch Challenge](./stretch.md) | Advanced: Add re-ranking, hybrid search, or evaluation metrics               |

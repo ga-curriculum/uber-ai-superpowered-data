@@ -23,5 +23,6 @@ This module introduces Retrieval-Augmented Generation (RAG) as a practical way t
 | Lesson                                                | Est. Delivery Time | Learning Objective                                                                           |
 | ----------------------------------------------------- | :----------------: | -------------------------------------------------------------------------------------------- |
 | [What is RAG?](./what-is-rag/README.md)               |         --         | Explain the purpose of Retrieval-Augmented Generation (RAG) and outline its core components. |
-| [Demo: RAG Walkthrough](./demo-walkthrough/README.md) |         --         | Build and monitor a RAG pipeline for accurate, reliable outputs. LO                          |
-| **Total content**                                     |         60         |                                                                                              |
+| [When to Use RAG](./when-to-use-rag/README.md)        |         --         | Determine when RAG is appropriate and compare it with alternative approaches.                |
+| [Demo: RAG Walkthrough](./demo-walkthrough/README.md) |         --         | Build and monitor a RAG pipeline for accurate, reliable outputs.                             |
+| **Total content**                                     |       60 min       |                                                                                              |
