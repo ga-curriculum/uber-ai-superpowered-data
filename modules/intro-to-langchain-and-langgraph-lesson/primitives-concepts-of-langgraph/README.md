@@ -250,19 +250,15 @@ How it works:
 | **Learning curve** | Gentler                           | Steeper, but pays off for complex systems             |
 
 
-## Interactive Prompt (2–3m Discussion)
+## Reflection
 
-👉 If you were designing a financial control system with multiple agents (evidence gathering, review, approval), which primitive (Node, Edge, State, Graph) do you think is most important to get right from day one? Why?
+If you were designing a financial control system with multiple agents (evidence gathering, review, approval), which primitive (Node, Edge, State, Graph) do you think is most important to get right from day one? Why?
 
-Suggested prompts:
+Furhter questions:
 
 - What happens if your State schema changes mid-project?
 - How would poor Edge design impact your audit trail?
 - Can you recover from errors if Node boundaries aren’t clear?
-
-💡 **Facilitator note:** Highlight that **State** is usually most critical for auditability — it’s your permanent record of what happened and why.
-
-
 
 ## Key Takeaway
 

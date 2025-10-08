@@ -233,6 +233,7 @@ prompt = PromptTemplate(
 
 # Chain it together
 llm = ChatOpenAI(temperature=0)
+# (LangChain Expression Language)
 chain = prompt | llm | parser
 
 result = chain.invoke({
