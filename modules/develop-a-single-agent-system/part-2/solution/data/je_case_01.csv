@@ -1,0 +1,3 @@
+entry_id,date,account,amount,approver_1,approver_2,notes
+1001,2024-07-01,Accounts Payable,1200,j.smith,m.wilson,Laptop purchase
+1002,2024-07-02,Accounts Payable,2200,a.jones,c.kim,Software renewal

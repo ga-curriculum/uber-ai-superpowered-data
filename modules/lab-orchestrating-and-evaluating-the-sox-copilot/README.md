@@ -47,11 +47,14 @@ The pipeline covers the full lifecycle:
 - Basic knowledge of typed Python (TypedDict or dataclasses)
 
 **Environment Setup:**
-Same as Parts 1 & 2, plus:
+Same as Parts 1 & 2:
 ```bash
-# Ensure langgraph is installed
-pipenv install langgraph
+cd modules/lab-orchestrating-and-evaluating-the-sox-copilot/solution
+pipenv install
+pipenv shell
 ```
+
+The Pipfile already includes `langgraph ~=0.2.0`.
 
 **Key Concepts to Understand:**
 - **Nodes**: Individual functions that transform state
@@ -322,60 +325,40 @@ This graph-centric approach improves determinism, auditability, and replayabilit
 
 **Implementation Pattern**:
 ```python
-from pydantic import BaseModel, Field, validator
-from typing import List, Dict
+from typing import List
+from pydantic import BaseModel, Field
 
 class Population(BaseModel):
-    """Population metadata for what was tested"""
-    tested_count: int = Field(ge=0, description="Number of entries tested")
-    criteria: str = Field(description="Filter criteria applied")
+    tested_count: int = Field(ge=0)
+    criteria: str
 
 class EvidencePayload(BaseModel):
-    """Structured evidence output with validation"""
-    control_id: str = Field(description="SOX control identifier")
-    period: str = Field(description="Audit period (YYYY-MM)")
-    violations_found: int = Field(ge=0, description="Count of violations")
-    violation_entries: List[str] = Field(description="Entry IDs that violated")
-    policy_summary: str = Field(description="Business rule text")
+    control_id: str
+    period: str
+    violations_found: int = Field(ge=0)
+    violation_entries: List[str]
+    policy_summary: str
     population: Population
-    narrative: str = Field(min_length=50, description="Audit narrative")
-    
-    @validator("violation_entries")
-    def check_parity(cls, v, values):
-        """Ensure count matches list length"""
-        count = values.get("violations_found", 0)
-        if len(v) != count:
-            raise ValueError(
-                f"Parity error: violations_found={count} but "
-                f"violation_entries has {len(v)} items"
-            )
-        return v
+    narrative: str
 
 class ReviewPayload(BaseModel):
-    """Structured review output with validation"""
     reviewed_control_id: str
     period: str
-    evidence_valid: bool = Field(description="Whether evidence passed validation")
-    issues: List[str] = Field(default_factory=list, description="Validation issues found")
-    review_notes: str = Field(min_length=20, description="Reviewer commentary")
-    
-    @validator("issues")
-    def issues_when_invalid(cls, v, values):
-        """If invalid, must have issues listed"""
-        if not values.get("evidence_valid") and len(v) == 0:
-            raise ValueError("evidence_valid=False requires non-empty issues list")
-        return v
+    evidence_valid: bool
+    issues: List[str]
+    review_notes: str
 ```
 
 **Why this matters**:
 - **Runtime Validation**: Pydantic catches schema violations immediately
-- **Parity Checks**: Custom validators enforce business rules
-- **Type Safety**: IDE autocomplete and type checking
-- **Self-Documenting**: Field descriptions explain intent
+- **Type Safety**: IDE autocomplete and type checking  
+- **Clean Serialization**: Easy conversion to/from dicts and JSON
+- **Field Constraints**: `Field(ge=0)` ensures non-negative values
 
 **Test it**:
 ```python
 from sox_copilot.models import EvidencePayload, Population
+from pydantic import ValidationError
 
 # Valid evidence
 evidence = EvidencePayload(
@@ -385,22 +368,25 @@ evidence = EvidencePayload(
     violation_entries=["1002", "1003"],
     policy_summary="All payables over $1000 require dual approval.",
     population=Population(tested_count=3, criteria="AP > $1000"),
-    narrative="Testing identified 2 violations..."
+    narrative="Testing identified 2 violations in the audit period."
 )
-print(evidence.dict())  # Serializes to dict
+print(evidence.model_dump())  # Serializes to dict
 
-# Invalid evidence (parity error)
+# Invalid evidence (negative violations)
 try:
     bad = EvidencePayload(
-        violations_found=5,  # Wrong!
-        violation_entries=["1002", "1003"],  # Only 2 items
-        # ... other fields
+        control_id="PAY-002",
+        violations_found=-1,  # Invalid! Must be >= 0
+        violation_entries=[],
+        policy_summary="...",
+        population=Population(tested_count=0, criteria="..."),
+        narrative="..."
     )
 except ValidationError as e:
-    print("Caught parity error:", e)
+    print("Caught validation error:", e)
 ```
 
-**✅ Checkpoint**: Do the Pydantic models catch parity errors and missing fields?
+**✅ Checkpoint**: Do the Pydantic models catch negative values and missing required fields?
 
 ---
 
@@ -412,7 +398,8 @@ except ValidationError as e:
 
 **Implementation Pattern**:
 ```python
-from typing import TypedDict, Optional, Dict, Any
+from typing import TypedDict, Optional
+from .models import EvidencePayload, ReviewPayload
 
 class GraphState(TypedDict, total=False):
     """
@@ -426,19 +413,22 @@ class GraphState(TypedDict, total=False):
     period: str
     csv_path: str
     
-    # Intermediate values (populated by nodes)
-    policy_summary: Optional[str]
-    facts: Optional[Dict[str, Any]]
-    narrative: Optional[str]
-    validation_result: Optional[Dict[str, Any]]
-    review_notes: Optional[str]
+    # Evidence phase intermediates
+    policy_summary: str
+    facts: dict            # {"violations_found": int, "violation_entries": [...], "population": {...}}
+    facts_json: str
+    narrative: str
     
-    # Final outputs (structured payloads)
-    evidence: Optional[Dict[str, Any]]
-    review: Optional[Dict[str, Any]]
+    # Validated outputs
+    evidence: EvidencePayload
+    evidence_errors: str   # serialized pydantic errors if any
     
-    # Error handling
-    error: Optional[str]
+    # Review phase intermediates
+    comparison: dict       # {"reviewed_control_id":..., "period":..., "evidence_valid":..., "issues":[...]}
+    review_notes: str
+    
+    # Final
+    review: ReviewPayload
 ```
 
 **Why this matters**:
@@ -460,89 +450,90 @@ class GraphState(TypedDict, total=False):
 **Implementation Pattern**:
 ```python
 from .tools import (
-    get_policy_summary as get_policy_tool,
-    run_deterministic_check as run_check_tool,
-    generate_narrative as generate_narrative_tool,
-    recount_and_compare as recount_tool,
-    generate_review_notes as review_notes_tool,
+    get_policy_summary,
+    run_deterministic_check,
+    generate_narrative,
+    recount_and_compare,
+    generate_review_notes,
 )
 from .models import EvidencePayload, ReviewPayload
-from pydantic import ValidationError
 import json
 
-def fetch_policy_node(state: GraphState) -> GraphState:
+def node_get_policy(state: GraphState) -> GraphState:
     """Node: Fetch policy summary for the control"""
-    control_id = state["control_id"]
-    policy = get_policy_tool(control_id)
-    return {**state, "policy_summary": policy}
+    summary = get_policy_summary.invoke({"control_id": state["control_id"]})
+    return {"policy_summary": summary}
 
-def run_check_node(state: GraphState) -> GraphState:
+def node_run_check(state: GraphState) -> GraphState:
     """Node: Run deterministic PAY-002 check"""
-    facts = run_check_tool(
-        state["control_id"],
-        state["period"],
-        state["csv_path"]
-    )
-    return {**state, "facts": facts}
+    facts = run_deterministic_check.invoke({
+        "control_id": state["control_id"],
+        "period": state["period"],
+        "csv_path": state["csv_path"],
+    })
+    return {"facts": facts, "facts_json": json.dumps(facts)}
 
-def generate_narrative_node(state: GraphState) -> GraphState:
+def node_generate_narrative(state: GraphState) -> GraphState:
     """Node: Generate audit narrative from policy + facts"""
-    narrative = generate_narrative_tool(
-        state["control_id"],
-        state["period"],
-        state["policy_summary"],
-        json.dumps(state["facts"])
-    )
-    return {**state, "narrative": narrative}
+    nar = generate_narrative.invoke({
+        "control_id": state["control_id"],
+        "period": state["period"],
+        "policy_summary": state["policy_summary"],
+        "facts_json": state["facts_json"],
+    })
+    return {"narrative": nar}
 
-def validate_evidence_node(state: GraphState) -> GraphState:
+def node_assemble_and_validate_evidence(state: GraphState) -> GraphState:
     """
     Node: Validate evidence payload using Pydantic.
     
-    This is a validation gate - if schema is invalid, set error.
+    This is a validation gate - if schema is invalid, set evidence_errors.
     """
     try:
-        evidence = EvidencePayload(
-            control_id=state["control_id"],
-            period=state["period"],
-            violations_found=state["facts"]["violations_found"],
-            violation_entries=state["facts"]["violation_entries"],
-            policy_summary=state["policy_summary"],
-            population=state["facts"]["population"],
-            narrative=state["narrative"],
-        )
-        return {**state, "evidence": evidence.dict()}
-    except ValidationError as e:
-        return {**state, "error": f"Evidence validation failed: {e}"}
+        payload = EvidencePayload.model_validate({
+            "control_id": state["control_id"],
+            "period": state["period"],
+            "violations_found": state["facts"]["violations_found"],
+            "violation_entries": state["facts"]["violation_entries"],
+            "policy_summary": state["policy_summary"],
+            "population": state["facts"]["population"],
+            "narrative": state["narrative"],
+        })
+        return {"evidence": payload, "evidence_errors": None}
+    except Exception as e:
+        return {"evidence_errors": str(e)}
 
-def recount_node(state: GraphState) -> GraphState:
+def node_recount_and_compare(state: GraphState) -> GraphState:
     """Node: Independently recount and compare to evidence"""
-    evidence_json = json.dumps(state["evidence"])
-    validation = recount_tool(evidence_json, state["csv_path"])
-    return {**state, "validation_result": validation}
+    comparison = recount_and_compare.invoke({
+        "csv_path": state["csv_path"],
+        "evidence_json": state["evidence"].model_dump_json(),
+    })
+    return {"comparison": comparison}
 
-def generate_review_notes_node(state: GraphState) -> GraphState:
+def node_generate_review_notes(state: GraphState) -> GraphState:
     """Node: Generate reviewer notes from validation results"""
-    notes = review_notes_tool(
-        state["control_id"],
-        state["period"],
-        json.dumps(state["validation_result"])
-    )
-    return {**state, "review_notes": notes}
+    notes = generate_review_notes.invoke({
+        "control_id": state["comparison"]["reviewed_control_id"],
+        "period": state["comparison"]["period"],
+        "evidence_valid": state["comparison"]["evidence_valid"],
+        "issues": state["comparison"]["issues"],
+    })
+    return {"review_notes": notes}
 
-def validate_review_node(state: GraphState) -> GraphState:
+def node_assemble_and_validate_review(state: GraphState) -> GraphState:
     """Node: Validate review payload using Pydantic"""
     try:
-        review = ReviewPayload(
-            reviewed_control_id=state["control_id"],
-            period=state["period"],
-            evidence_valid=state["validation_result"]["evidence_valid"],
-            issues=state["validation_result"]["issues"],
-            review_notes=state["review_notes"],
-        )
-        return {**state, "review": review.dict()}
-    except ValidationError as e:
-        return {**state, "error": f"Review validation failed: {e}"}
+        review = ReviewPayload.model_validate({
+            "reviewed_control_id": state["comparison"]["reviewed_control_id"],
+            "period": state["comparison"]["period"],
+            "evidence_valid": state["comparison"]["evidence_valid"],
+            "issues": state["comparison"]["issues"],
+            "review_notes": state["review_notes"],
+        })
+        return {"review": review}
+    except Exception as e:
+        return {"review": None}
 ```
 
 **Why this matters**:
@@ -563,26 +554,14 @@ def validate_review_node(state: GraphState) -> GraphState:
 
 **Implementation Pattern**:
 ```python
-def should_continue_after_evidence_validation(state: GraphState) -> str:
+def route_evidence_valid(state: GraphState) -> str:
     """
     Router: Decide whether to continue to review or stop.
     
-    If evidence validation failed, stop early.
+    If evidence validation failed (evidence_errors is set), stop early.
     Otherwise, proceed to independent recount.
     """
-    if state.get("error"):
-        return "error"
-    if state.get("evidence") is None:
-        return "error"
-    return "continue"
-
-def should_continue_after_review_validation(state: GraphState) -> str:
-    """
-    Router: Check if review validation succeeded.
-    """
-    if state.get("error"):
-        return "error"
-    return "success"
+    return "ok" if not state.get("evidence_errors") else "invalid"
 ```
 
 **Why this matters**:
@@ -602,64 +581,54 @@ def should_continue_after_review_validation(state: GraphState) -> str:
 
 **Implementation Pattern**:
 ```python
-from langgraph.graph import StateGraph, END
+from langgraph.graph import StateGraph, START, END
 
 def build_evidence_review_graph():
     """
     Build the complete evidence + review pipeline graph.
     
     Flow:
-    START → policy → check → narrative → validate_evidence
-                                            ↓
-                                    (if valid) recount → review_notes → validate_review → END
-                                    (if invalid) → END (error)
+    START → get_policy → run_check → write_narrative → evidence_validate
+                                                            ↓
+                                    (if ok) recount_compare → write_review_notes → review_validate → END
+                                    (if invalid) → END (early exit)
     """
     # Initialize graph with state schema
-    workflow = StateGraph(GraphState)
+    g = StateGraph(GraphState)
     
-    # Add all nodes
-    workflow.add_node("fetch_policy", fetch_policy_node)
-    workflow.add_node("run_check", run_check_node)
-    workflow.add_node("generate_narrative", generate_narrative_node)
-    workflow.add_node("validate_evidence", validate_evidence_node)
-    workflow.add_node("recount", recount_node)
-    workflow.add_node("generate_review_notes", generate_review_notes_node)
-    workflow.add_node("validate_review", validate_review_node)
+    # Add evidence path nodes
+    g.add_node("get_policy", node_get_policy)
+    g.add_node("run_check", node_run_check)
+    g.add_node("write_narrative", node_generate_narrative)
+    g.add_node("evidence_validate", node_assemble_and_validate_evidence)
     
-    # Set entry point
-    workflow.set_entry_point("fetch_policy")
+    # Add review path nodes
+    g.add_node("recount_compare", node_recount_and_compare)
+    g.add_node("write_review_notes", node_generate_review_notes)
+    g.add_node("review_validate", node_assemble_and_validate_review)
     
-    # Add simple edges (always execute in order)
-    workflow.add_edge("fetch_policy", "run_check")
-    workflow.add_edge("run_check", "generate_narrative")
-    workflow.add_edge("generate_narrative", "validate_evidence")
+    # Edges: Evidence sequence
+    g.add_edge(START, "get_policy")
+    g.add_edge("get_policy", "run_check")
+    g.add_edge("run_check", "write_narrative")
+    g.add_edge("write_narrative", "evidence_validate")
     
-    # Conditional edge: only continue to review if evidence is valid
-    workflow.add_conditional_edges(
-        "validate_evidence",
-        should_continue_after_evidence_validation,
+    # Conditional: evidence validation gate
+    g.add_conditional_edges(
+        "evidence_validate",
+        route_evidence_valid,
         {
-            "continue": "recount",
-            "error": END  # Stop early if validation fails
-        }
+            "ok": "recount_compare",      # proceed to reviewer flow
+            "invalid": END,               # stop early; evidence schema failed
+        },
     )
     
-    # Continue review flow
-    workflow.add_edge("recount", "generate_review_notes")
-    workflow.add_edge("generate_review_notes", "validate_review")
+    # Review sequence
+    g.add_edge("recount_compare", "write_review_notes")
+    g.add_edge("write_review_notes", "review_validate")
+    g.add_edge("review_validate", END)
     
-    # Conditional edge: check final review validation
-    workflow.add_conditional_edges(
-        "validate_review",
-        should_continue_after_review_validation,
-        {
-            "success": END,
-            "error": END
-        }
-    )
-    
-    # Compile the graph
-    return workflow.compile()
+    return g.compile()
 ```
 
 **Why this matters**:
@@ -673,22 +642,36 @@ def build_evidence_review_graph():
 from sox_copilot.graph_evidence_review import build_evidence_review_graph
 
 app = build_evidence_review_graph()
+print("🧭 Graph compiled")
 
-result = app.invoke({
+# Run the pipeline
+inputs = {
     "control_id": "PAY-002",
     "period": "2024-07",
-    "csv_path": "data/journal_entries.csv"
-})
+    "csv_path": "data/journal_entries.csv",
+}
+final = app.invoke(inputs)
 
-print("Evidence:", result.get("evidence"))
-print("Review:", result.get("review"))
-print("Error:", result.get("error"))
+# Extract validated models
+evidence = final.get("evidence")
+review = final.get("review")
+
+print("✅ Evidence validated" if evidence else "❌ Evidence failed validation")
+print("✅ Review validated" if review else "❌ Review failed validation")
+
+# Pretty print
+if evidence:
+    print("\n--- Evidence ---")
+    print(evidence.model_dump())
+if review:
+    print("\n--- Review ---")
+    print(review.model_dump())
 ```
 
 **✅ Checkpoint**: 
-- Does the graph execute all nodes in order?
-- Is evidence validated before proceeding to review?
-- Are both evidence and review payloads in the final state?
+- Does the graph compile without errors?
+- Does the pipeline execute all nodes in order?
+- Are both evidence and review payloads Pydantic models in the final state?
 
 ---
 
@@ -717,23 +700,94 @@ except Exception:
 
 ---
 
+## Notebook Structure
+
+The `sox_copilot_lab.ipynb` notebook demonstrates the complete LangGraph pipeline:
+
+**Cell 0-1: Setup and Data Exploration**
+- Load environment variables
+- Import pandas and explore journal entries CSV
+
+**Cell 2: Build Graph**
+```python
+from sox_copilot.graph_evidence_review import build_evidence_review_graph
+app = build_evidence_review_graph()
+print("🧭 Graph compiled")
+```
+
+**Cell 3-4: Visualize Graph Structure**
+- Use `app.get_graph().draw_mermaid_png()` to generate visual diagram
+- Shows node connections and conditional routing
+
+**Cell 5-6: Test Validation Gates**
+- Test valid `EvidencePayload` creation
+- Test parity error catching (violations_found != len(violation_entries))
+- Test missing required field detection
+
+**Cell 7-8: Verify Early Exit Logic**
+- Confirm graph has conditional routing from `evidence_validate`
+- Routes to `recount_compare` if valid, END if invalid
+
+**Cell 9-10: Stream Pipeline Execution**
+```python
+for i, step in enumerate(app.stream(inputs), 1):
+    node_name = list(step.keys())[0]
+    node_output = step[node_name]
+    print(f"📍 Step {i}: {node_name}")
+    # Display intermediate state changes
+```
+
+**Cell 11-12: Inspect Final State**
+```python
+final_state = app.invoke(inputs)
+# Trace data flow through all phases
+print("Evidence:", final_state.get('evidence'))
+print("Review:", final_state.get('review'))
+```
+
+**Cell 13-14: Standard Execution**
+```python
+final = app.invoke(inputs)
+evidence = final.get("evidence")
+review = final.get("review")
+if evidence:
+    print(evidence.model_dump())
+if review:
+    print(review.model_dump())
+```
+
+**Cell 15-16: Save Results**
+```python
+import json, os
+os.makedirs("out", exist_ok=True)
+if evidence: 
+    with open("out/evidence.json","w") as f: 
+        json.dump(evidence.model_dump(), f, indent=2)
+if review:
+    with open("out/review.json","w") as f: 
+        json.dump(review.model_dump(), f, indent=2)
+```
+
+---
+
 ## Testing Your Implementation
 
 ### Unit Testing Individual Nodes
 
 ```python
-from sox_copilot.graph_evidence_review import fetch_policy_node, run_check_node
+from sox_copilot.graph_evidence_review import node_get_policy, node_run_check
 
 # Test policy node
-state = {"control_id": "PAY-002", "period": "2024-07", "csv_path": "..."}
-new_state = fetch_policy_node(state)
+state = {"control_id": "PAY-002", "period": "2024-07", "csv_path": "data/journal_entries.csv"}
+new_state = node_get_policy(state)
 assert "policy_summary" in new_state
 assert "dual approval" in new_state["policy_summary"].lower()
 
 # Test check node
-state_with_policy = {**new_state}
-state_with_facts = run_check_node(state_with_policy)
+state_with_policy = {**state, **new_state}
+state_with_facts = node_run_check(state_with_policy)
 assert "facts" in state_with_facts
+assert "facts_json" in state_with_facts
 assert state_with_facts["facts"]["violations_found"] == 2
 ```
 
@@ -752,71 +806,75 @@ result = app.invoke({
 })
 
 # Assertions
-assert result.get("error") is None, f"Unexpected error: {result.get('error')}"
+assert result.get("evidence_errors") is None, f"Unexpected validation error: {result.get('evidence_errors')}"
 assert "evidence" in result
 assert "review" in result
-assert result["evidence"]["violations_found"] == 2
-assert result["review"]["evidence_valid"] == True
+assert result["evidence"].violations_found == 2
+assert result["review"].evidence_valid == True
 ```
 
 ### Testing Validation Gates
 
 ```python
-# Test that parity errors are caught
-from sox_copilot.models import EvidencePayload
+# Test that negative values are caught
+from sox_copilot.models import EvidencePayload, Population
 from pydantic import ValidationError
 
 try:
     bad_evidence = EvidencePayload(
         control_id="PAY-002",
         period="2024-07",
-        violations_found=10,  # Wrong!
-        violation_entries=["1002", "1003"],  # Only 2
-        policy_summary="...",
-        population={"tested_count": 3, "criteria": "..."},
+        violations_found=-1,  # Invalid! Must be >= 0
+        violation_entries=[],
+        policy_summary="All payables over $1000 require dual approval.",
+        population=Population(tested_count=0, criteria="AP > $1000"),
         narrative="Some text"
     )
     assert False, "Should have raised ValidationError"
 except ValidationError as e:
-    assert "Parity error" in str(e)
+    print(f"✓ Validation error caught: {e}")
 ```
 
 ### Debugging Tips
 
 **If nodes aren't executing:**
-- Check that entry point is set: `workflow.set_entry_point("fetch_policy")`
+- Check that entry point uses START: `g.add_edge(START, "get_policy")`
 - Verify all edges are added between nodes
-- Print state at each node to see transformations
+- Use `app.stream(inputs)` to see intermediate state changes
 
 **If conditional routing doesn't work:**
-- Check router function return values match edge mapping keys
-- Ensure router functions are checking the right state fields
+- Check router function return values match edge mapping keys exactly
+- Router returns `"ok"` or `"invalid"` to match edge mapping
 - Add print statements in routers to see which path is taken
 
 **If Pydantic validation always fails:**
 - Check that state fields match model field names exactly
 - Verify types (e.g., list vs tuple, int vs string)
-- Use `model.dict()` to serialize, not raw model instance
+- Use `model.model_dump()` to serialize (Pydantic v2), not `dict()`
+- Use `model.model_validate()` to validate dicts (Pydantic v2)
 
 ---
 
 ## Common Pitfalls
 
-### Pitfall 1: Mutating State Instead of Returning New State
-**Problem**: Nodes modify state in-place
+### Pitfall 1: Returning Full State vs Partial Updates
+**Problem**: Nodes can return just the fields they're updating (partial state)
 
-**Bad:**
+**Both work, but partial is cleaner:**
 ```python
-def bad_node(state: GraphState) -> GraphState:
-    state["new_field"] = "value"  # Mutating!
-    return state
-```
-
-**Good:**
-```python
+# Good: Return only what changed
 def good_node(state: GraphState) -> GraphState:
-    return {**state, "new_field": "value"}  # New dict
+    return {"new_field": "value"}  # Partial update
+
+# Also works: Return full state
+def also_good_node(state: GraphState) -> GraphState:
+    return {**state, "new_field": "value"}  # Full state
 ```
+
+**Why partial is better:**
+- More concise
+- Clearer intent (shows what changed)
+- LangGraph merges it automatically
 
 ### Pitfall 2: Missing Conditional Edge Mappings
 **Problem**: Router returns a key that doesn't exist in edge mapping
@@ -826,14 +884,24 @@ def good_node(state: GraphState) -> GraphState:
 def router(state):
     return "unknown_key"  # Not in mapping!
 
-workflow.add_conditional_edges(
+g.add_conditional_edges(
     "node",
     router,
-    {"continue": "next", "error": END}  # Missing "unknown_key"
+    {"ok": "next", "invalid": END}  # Missing "unknown_key"
 )
 ```
 
-**Solution**: Ensure router only returns keys that exist in the mapping.
+**Good:**
+```python
+def router(state):
+    return "ok" if not state.get("error") else "invalid"  # Matches mapping
+
+g.add_conditional_edges(
+    "node",
+    router,
+    {"ok": "next", "invalid": END}  # Keys match router returns
+)
+```
 
 ### Pitfall 3: Not Handling Validation Errors
 **Problem**: ValidationError crashes the pipeline
@@ -841,18 +909,22 @@ workflow.add_conditional_edges(
 **Bad:**
 ```python
 def validate_node(state):
-    evidence = EvidencePayload(**state)  # Can raise ValidationError
-    return {**state, "evidence": evidence.dict()}
+    payload = EvidencePayload.model_validate(state)  # Can raise ValidationError
+    return {"evidence": payload}
 ```
 
 **Good:**
 ```python
 def validate_node(state):
     try:
-        evidence = EvidencePayload(**state)
-        return {**state, "evidence": evidence.dict()}
-    except ValidationError as e:
-        return {**state, "error": str(e)}
+        payload = EvidencePayload.model_validate({
+            "control_id": state["control_id"],
+            "period": state["period"],
+            # ... other fields
+        })
+        return {"evidence": payload, "evidence_errors": None}
+    except Exception as e:
+        return {"evidence_errors": str(e)}
 ```
 
 ### Pitfall 4: Forgetting to Compile the Graph
@@ -860,16 +932,16 @@ def validate_node(state):
 
 **Bad:**
 ```python
-workflow = StateGraph(GraphState)
+g = StateGraph(GraphState)
 # ... add nodes and edges ...
-result = workflow.invoke({...})  # Error!
+result = g.invoke({...})  # Error!
 ```
 
 **Good:**
 ```python
-workflow = StateGraph(GraphState)
+g = StateGraph(GraphState)
 # ... add nodes and edges ...
-app = workflow.compile()  # Compile first!
+app = g.compile()  # Compile first!
 result = app.invoke({...})
 ```
 
@@ -916,8 +988,11 @@ evidence = EvidencePayload(violations_found=state["violations_found"])  # Valida
 
 ## Deliverables
 
-* `sox_copilot/graph_evidence_review.py` — The LangGraph pipeline and nodes
-* `sox_copilot/models.py` — Pydantic models for `EvidencePayload` and `ReviewPayload`
-* `sox_copilot/tools.py` — Reused tools (`run_deterministic_check`, `get_policy_summary`, `generate_narrative`, `recount_and_compare`, `generate_review_notes`)
-* Notebook section: Part 3 — LangGraph Evidence + Review
+* `sox_copilot/graph_evidence_review.py` — The LangGraph pipeline with nodes, routing logic, and graph builder
+* `sox_copilot/models.py` — Pydantic models for `EvidencePayload`, `ReviewPayload`, and `Population`
+* `sox_copilot/tools.py` — Reused tools from Parts 1 & 2 (`run_deterministic_check`, `get_policy_summary`, `generate_narrative`, `recount_and_compare`, `generate_review_notes`)
+* `sox_copilot/checks.py` — Deterministic business logic (reused from Parts 1 & 2)
+* `sox_copilot/config.py` — Configuration constants (reused from Parts 1 & 2)
+* `sox_copilot_lab.ipynb` — Complete notebook demonstrating graph visualization, streaming, validation gates, and final execution
+* `out/` directory — Saved evidence.json and review.json outputs
 

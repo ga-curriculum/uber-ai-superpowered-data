@@ -73,4 +73,12 @@
 
 ---
 
-Do you want me to also add a short **“Next Steps”** section (like extending the lab to other SOX controls or scaling to multi-agent orchestration), or should we keep it lean and only about setup + troubleshooting?
+## Running the Lab
+
+Once your environment is set up and the kernel is selected:
+
+1. Open `sox_copilot_lab.ipynb`
+2. Run cells sequentially from top to bottom
+3. The agent should automatically orchestrate tool calls and produce a structured JSON report
+
+See the parent directory's main README.md for detailed implementation guidance and architectural explanations.

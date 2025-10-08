@@ -73,4 +73,17 @@
 
 ---
 
-Do you want me to also add a short **“Next Steps”** section (like extending the lab to other SOX controls or scaling to multi-agent orchestration), or should we keep it lean and only about setup + troubleshooting?
+## Running the Lab
+
+Once your environment is set up and the kernel is selected:
+
+1. Open `sox_copilot_lab.ipynb`
+2. Run cells sequentially from top to bottom
+3. The notebook demonstrates:
+   - Graph compilation and visualization
+   - Pydantic validation gate testing
+   - Streaming execution to see intermediate states
+   - Full pipeline execution with Evidence and Review payloads
+   - Saving results to disk
+
+See the parent directory's main README.md for detailed implementation guidance and architectural explanations.

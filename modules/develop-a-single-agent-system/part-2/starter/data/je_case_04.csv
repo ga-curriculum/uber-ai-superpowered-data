@@ -1,0 +1,4 @@
+entry_id,date,account,amount,approver_1,approver_2,notes
+1005,2024-07-05,Accounts Payable,2000,j.smith,,Office rent
+1006,2024-07-06,Accounts Payable,3100,,a.jones,Travel expense
+1007,2024-07-07,Accounts Payable,1500,a.jones,,Office snacks

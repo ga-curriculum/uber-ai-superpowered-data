@@ -217,6 +217,61 @@ The output should be professional and auditable, clearly stating whether the evi
 
 ---
 
+## Notebook Structure
+
+The `sox_copilot_lab.ipynb` notebook extends Part 1 with additional cells:
+
+**Cells 0-4: Evidence Agent** (from Part 1)
+- Environment setup
+- Data exploration
+- Build and run Evidence Agent
+- Validation
+
+**Cell 5: Build Reviewer Agent**
+```python
+from sox_copilot.reviewer_agent import build_reviewer_agent
+import json
+
+# Ensure we have a JSON string for the reviewer input
+evidence_json = json.dumps(report)  # or use `raw` directly if you kept it
+
+reviewer = build_reviewer_agent()
+print("🤖 Agent built successfully!")
+```
+
+**Cell 6: Run Reviewer Agent**
+```python
+print("🧮 Running reviewer agent...")
+rev_res = reviewer.invoke({
+    "evidence": evidence_json,
+    "csv_path": "data/journal_entries.csv",
+})
+
+rev_raw = rev_res["output"]  # JSON string
+print(rev_raw)
+
+# Quick checks
+rev = json.loads(rev_raw)
+assert set(rev) == {"reviewed_control_id", "period", "evidence_valid", "issues", "review_notes"}
+print("✅ Reviewer output shape OK")
+rev
+```
+
+**Cell 7: Test Valid Evidence**
+```python
+print("✅ Test Case: Valid Evidence")
+print(f"Evidence valid: {rev['evidence_valid']}")
+print(f"Issues found: {rev['issues']}")
+
+assert rev['evidence_valid'] == True, "Valid evidence should pass review"
+assert len(rev['issues']) == 0, "Valid evidence should have no issues"
+print("✅ Valid evidence test PASSED\n")
+```
+
+**Cell 8: Empty** (for student experimentation with invalid evidence)
+
+---
+
 ## Step-by-Step Implementation Guide
 
 ### Step 1: Build the Recount and Compare Tool
@@ -234,103 +289,88 @@ A deterministic validation tool that performs three functions:
 **Implementation Pattern**:
 ```python
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List
 from langchain.tools import tool
-from .checks import load_logs, filter_payables_over_threshold, 
-                    find_dual_approval_violations, summarize_violations
+from .checks import count_pay002_violations_from_csv
 from .config import AMOUNT_THRESHOLD
 
 @tool("recount_and_compare", return_direct=False)
-def recount_and_compare(evidence_json: str, csv_path: str) -> Dict[str, Any]:
+def recount_and_compare(csv_path: str, evidence_json: str) -> Dict[str, Any]:
     """
-    Independently recount violations and compare to the submitted evidence.
-    
-    This is a VALIDATION tool - it doesn't trust the evidence, it verifies it.
-    
+    Recount violations independently and compare against the provided evidence payload.
+
     Args:
-        evidence_json: JSON string of the evidence payload to validate
-        csv_path: Path to the original CSV data
-        
+        csv_path: Path to the source CSV used to generate evidence
+        evidence_json: Evidence payload as a JSON string (dict with control_id, period,
+                       violations_found, violation_entries, population, narrative, ...)
+
     Returns:
         {
+          "reviewed_control_id": str,
+          "period": str,
           "evidence_valid": bool,
-          "issues": list[str],
-          "recount": {"violations_found": int, "violation_entries": list[str]},
-          "submitted": {"violations_found": int, "violation_entries": list[str]}
+          "issues": list[str]
         }
     """
-    # Parse the evidence that was submitted
-    evidence = json.loads(evidence_json)
-    
-    # Extract what the Evidence Agent claimed
-    submitted_count = evidence.get("violations_found", 0)
-    submitted_entries = set(evidence.get("violation_entries", []))
-    
-    # INDEPENDENT RECOUNT: Same logic as Evidence Agent, but fresh
-    rows = load_logs(csv_path)
-    ap_over = filter_payables_over_threshold(rows, AMOUNT_THRESHOLD)
-    violations = find_dual_approval_violations(ap_over)
-    summary = summarize_violations(violations)
-    
-    recount_count = summary["count"]
-    recount_entries = set(summary["entry_ids"])
-    
-    # COMPARISON LOGIC: Find discrepancies
-    issues = []
-    
-    # Parity check: Does the count match the list length in submitted evidence?
-    if submitted_count != len(evidence.get("violation_entries", [])):
-        issues.append(
-            f"Parity issue: violations_found ({submitted_count}) != "
-            f"len(violation_entries) ({len(evidence.get('violation_entries', []))})"
-        )
-    
-    # Count comparison: Does our recount match their count?
-    if recount_count != submitted_count:
-        issues.append(
-            f"Count mismatch: Recount found {recount_count}, "
-            f"evidence claims {submitted_count}"
-        )
-    
-    # Entry ID comparison: Are the violation lists identical?
-    missing_in_evidence = recount_entries - submitted_entries
-    extra_in_evidence = submitted_entries - recount_entries
-    
-    if missing_in_evidence:
-        issues.append(
-            f"Missing violations in evidence: {sorted(missing_in_evidence)}"
-        )
-    if extra_in_evidence:
-        issues.append(
-            f"Extra violations in evidence: {sorted(extra_in_evidence)}"
-        )
-    
-    # Determine validity
-    evidence_valid = len(issues) == 0
-    
+    issues: List[str] = []
+
+    # Parse the incoming JSON string
+    try:
+        ev = json.loads(evidence_json)
+    except Exception:
+        return {
+            "reviewed_control_id": "UNKNOWN",
+            "period": "UNKNOWN",
+            "evidence_valid": False,
+            "issues": ["invalid_evidence_json"],
+        }
+
+    control_id = ev.get("control_id")
+    period = ev.get("period", "UNKNOWN")
+
+    # Basic presence checks
+    if control_id is None:
+        issues.append("missing_control_id")
+    if "violations_found" not in ev:
+        issues.append("missing_violations_found")
+    if "violation_entries" not in ev:
+        issues.append("missing_violation_entries")
+
+    # Parity check: count must match list length
+    try:
+        if ev.get("violations_found") != len(ev.get("violation_entries", [])):
+            issues.append("violations_found != len(violation_entries)")
+    except Exception:
+        issues.append("failed_parity_check")
+
+    # Independent recount (lab supports PAY-002 only)
+    if control_id == "PAY-002":
+        recount = count_pay002_violations_from_csv(csv_path, AMOUNT_THRESHOLD)
+        if recount != ev.get("violations_found"):
+            issues.append(
+                f"independent_recount={recount} != evidence_count={ev.get('violations_found')}"
+            )
+    else:
+        issues.append(f"unsupported_control_id={control_id}")
+
     return {
-        "evidence_valid": evidence_valid,
+        "reviewed_control_id": control_id or "UNKNOWN",
+        "period": period,
+        "evidence_valid": len(issues) == 0,
         "issues": issues,
-        "recount": {
-            "violations_found": recount_count,
-            "violation_entries": sorted(recount_entries),
-        },
-        "submitted": {
-            "violations_found": submitted_count,
-            "violation_entries": sorted(submitted_entries),
-        },
     }
 ```
 
 **Why this matters**:
-- **Independent Verification**: Doesn't trust the Evidence Agent; recalculates everything
-- **Comprehensive Validation**: Checks both counts AND entry IDs
-- **Parity Checks**: Catches internal inconsistencies in the evidence itself
-- **Detailed Issues**: Provides specific discrepancies for debugging
+- **Independent Verification**: Doesn't trust the Evidence Agent; recalculates everything from source
+- **Simplified Validation**: Focuses on count comparison and parity checks (not detailed entry ID comparison)
+- **Error Handling**: Gracefully handles malformed JSON and missing fields
+- **Control-Specific Logic**: Uses helper function `count_pay002_violations_from_csv` for focused recounting
 
 **Test it**:
 ```python
 from sox_copilot.tools import recount_and_compare
+import json
 
 # Create a valid evidence JSON (from Part 1)
 evidence = json.dumps({
@@ -338,12 +378,14 @@ evidence = json.dumps({
     "period": "2024-07",
     "violations_found": 2,
     "violation_entries": ["1002", "1003"],
-    # ... other fields
+    "policy_summary": "All payables over $1000 require dual approval.",
+    "population": {"tested_count": 3, "criteria": "..."},
+    "narrative": "..."
 })
 
 result = recount_and_compare.invoke({
-    "evidence_json": evidence,
-    "csv_path": "data/journal_entries.csv"
+    "csv_path": "data/journal_entries.csv",
+    "evidence_json": evidence
 })
 
 print(result)
@@ -351,23 +393,25 @@ print(result)
 
 # Test with INVALID evidence
 bad_evidence = json.dumps({
+    "control_id": "PAY-002",
+    "period": "2024-07",
     "violations_found": 3,  # Wrong count!
     "violation_entries": ["1002", "1003"]
 })
 
 result2 = recount_and_compare.invoke({
-    "evidence_json": bad_evidence,
-    "csv_path": "data/journal_entries.csv"
+    "csv_path": "data/journal_entries.csv",
+    "evidence_json": bad_evidence
 })
 
 print(result2)
-# Should show: evidence_valid: False, issues: ["Count mismatch: ..."]
+# Should show: evidence_valid: False, issues: ["independent_recount=2 != evidence_count=3"]
 ```
 
 **✅ Checkpoint**: 
 - Does the tool catch count mismatches?
-- Does it detect missing or extra violation entries?
 - Does it flag parity issues (count != list length)?
+- Does it handle missing fields gracefully?
 
 ---
 
@@ -382,49 +426,44 @@ print(result2)
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from typing import List
 from .config import MODEL_NAME, MODEL_TEMP
 
 REVIEW_NOTES_SYSTEM_PROMPT = (
-    "You write concise reviewer notes (<100 words) for audit workpapers. "
-    "Based on validation results, state whether evidence is valid or not. "
-    "If valid, briefly confirm findings match. "
-    "If invalid, list specific issues found. "
-    "Tone: professional, factual, suitable for senior reviewer signature."
+    "You are a SOX reviewer. Be concise, neutral, and actionable. "
+    "Never invent facts. Write <= 100 words suitable for workpapers."
+)
+
+REVIEW_NOTES_USER_PROMPT = (
+    "Write reviewer notes for the evidence outcome below.\n"
+    "Control ID: {control_id}\n"
+    "Period: {period}\n"
+    "Evidence valid: {evidence_valid}\n"
+    "Issues: {issues}\n"
+    "Guidance: If 'Issues' is 'None', say the evidence appears consistent. "
+    "Avoid extra commentary."
 )
 
 @tool("generate_review_notes", return_direct=False)
-def generate_review_notes(control_id: str, period: str, 
-                          validation_results: str) -> str:
-    """
-    Generate professional reviewer notes from validation results.
-    
-    Args:
-        control_id: e.g., "PAY-002"
-        period: e.g., "2024-07"
-        validation_results: JSON string from recount_and_compare tool
-        
-    Returns:
-        Professional review notes suitable for audit workpapers
-    """
-    llm = ChatOpenAI(model=MODEL_NAME, temperature=MODEL_TEMP, max_tokens=150)
-    
+def generate_review_notes(control_id: str, period: str, evidence_valid: bool, issues: List[str]) -> str:
+    """Generate concise reviewer notes from the comparison result."""
+    llm = ChatOpenAI(model=MODEL_NAME, temperature=MODEL_TEMP, max_tokens=140)
     prompt = ChatPromptTemplate.from_messages([
         ("system", REVIEW_NOTES_SYSTEM_PROMPT),
-        ("user", "Write reviewer notes for control {control_id} in {period}.\n"
-                 "Validation results: {validation_results}")
+        ("user", REVIEW_NOTES_USER_PROMPT),
     ])
-    
     chain = prompt | llm | StrOutputParser()
-    
     return chain.invoke({
         "control_id": control_id,
         "period": period,
-        "validation_results": validation_results,
+        "evidence_valid": str(evidence_valid),              # keep it explicit for the prompt
+        "issues": ", ".join(issues) if issues else "None",  # compact list -> string
     }).strip()
 ```
 
 **Why this matters**:
 - **Professional Writing**: LLM converts technical validation results to audit language
+- **Explicit Parameters**: Takes structured data (not JSON string) for clearer interface
 - **Constrained Generation**: Short notes focused only on validation outcomes
 - **Separation of Logic**: Validation is deterministic, writing is generative
 
@@ -432,20 +471,27 @@ def generate_review_notes(control_id: str, period: str,
 ```python
 from sox_copilot.tools import generate_review_notes
 
-validation = json.dumps({
-    "evidence_valid": True,
-    "issues": [],
-    "recount": {"violations_found": 2}
-})
-
+# Test with valid evidence
 notes = generate_review_notes.invoke({
     "control_id": "PAY-002",
     "period": "2024-07",
-    "validation_results": validation
+    "evidence_valid": True,
+    "issues": []
 })
 
 print(notes)
-# Should say something like: "Evidence validated. Independent recount confirms..."
+# Should say something like: "Evidence appears consistent with source data..."
+
+# Test with invalid evidence
+notes2 = generate_review_notes.invoke({
+    "control_id": "PAY-002",
+    "period": "2024-07",
+    "evidence_valid": False,
+    "issues": ["independent_recount=2 != evidence_count=3"]
+})
+
+print(notes2)
+# Should mention the specific mismatch found
 ```
 
 **✅ Checkpoint**: Do the notes clearly state whether evidence is valid or invalid?
@@ -463,52 +509,57 @@ print(notes)
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 from .config import MODEL_NAME, AGENT_TEMP, MAX_ITER
 from .tools import recount_and_compare, generate_review_notes
 
-REVIEWER_SYSTEM_GUIDANCE = """
-You are an independent audit reviewer for SOX controls.
-- You MUST call tools to validate evidence. Never trust submitted evidence without verification.
-- First, recount violations independently using recount_and_compare.
-- Then, generate professional review notes using generate_review_notes.
-- Return ONLY one JSON object (no prose, no backticks).
+SYSTEM_GUIDANCE = f"""
+You are a SOX Reviewer Agent.
+- NEVER invent facts; you must call tools to re-check evidence deterministically.
+- Use tool outputs EXACTLY as returned for counts/IDs/flags.
+- When calling recount_and_compare, pass the EXACT evidence JSON string you received.
+- Write concise, professional review notes (<100 words); no extra commentary.
+- Final answer must be a single JSON object only (no extra text, no backticks).
 """.strip()
 
-REVIEWER_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", REVIEWER_SYSTEM_GUIDANCE),
+PROMPT = ChatPromptTemplate.from_messages([
+    ("system", SYSTEM_GUIDANCE),
     ("user",
-     """Review the submitted evidence for control {control_id} in {period}.
+     """Review this submitted evidence against the source CSV.
 
-Evidence to review: {evidence_json}
-CSV path for recount: {csv_path}
+Evidence (JSON string):
+{evidence}
 
-Required steps:
-1) recount_and_compare(evidence_json, csv_path) -> validation_results
-2) generate_review_notes(control_id, period, validation_results=<JSON from step 1>) -> notes
+CSV path:
+{csv_path}
+
+Use tools to:
+1) recount_and_compare(csv_path, evidence_json=<the EXACT string above>) -> comparison
+2) generate_review_notes(control_id=<from comparison>, period=<from comparison>,
+   evidence_valid=<from comparison>, issues=<from comparison>) -> review_notes
 
 Return ONLY this JSON:
 {{
-  "reviewed_control_id": "{control_id}",
-  "period": "{period}",
-  "evidence_valid": <bool from validation>,
-  "issues": <list[str] from validation>,
-  "review_notes": "<string from notes>"
-}}"""),
+  "reviewed_control_id": "<from comparison>",
+  "period": "<from comparison>",
+  "evidence_valid": true|false,
+  "issues": <list of strings from comparison>,
+  "review_notes": "<short narrative from tool>"
+}}
+"""),
     MessagesPlaceholder("agent_scratchpad"),
 ])
 
 def build_reviewer_agent() -> AgentExecutor:
     llm = ChatOpenAI(model=MODEL_NAME, temperature=AGENT_TEMP)
     tools = [recount_and_compare, generate_review_notes]
-    
-    agent = create_openai_tools_agent(llm=llm, tools=tools, prompt=REVIEWER_PROMPT)
-    
+    agent = create_openai_tools_agent(llm=llm, tools=tools, prompt=PROMPT)
     return AgentExecutor(
         agent=agent,
         tools=tools,
         max_iterations=MAX_ITER,
-        handle_parsing_errors=True,
         verbose=True,
+        handle_parsing_errors=True,
     )
 ```
 
@@ -523,26 +574,38 @@ from sox_copilot.evidence_agent import build_evidence_agent
 from sox_copilot.reviewer_agent import build_reviewer_agent
 import json
 
-# Step 1: Generate evidence
+# Step 1: Generate evidence (from previous lab)
 evidence_agent = build_evidence_agent()
-evidence_result = evidence_agent.invoke({
+res = evidence_agent.invoke({
     "control_id": "PAY-002",
     "period": "2024-07",
     "csv_path": "data/journal_entries.csv"
 })
-evidence_json = evidence_result["output"]
 
-# Step 2: Review the evidence
-reviewer_agent = build_reviewer_agent()
-review_result = reviewer_agent.invoke({
-    "control_id": "PAY-002",
-    "period": "2024-07",
-    "evidence_json": evidence_json,
-    "csv_path": "data/journal_entries.csv"
+raw = res["output"]
+report = json.loads(raw)
+
+# Step 2: Prepare evidence for review
+evidence_json = json.dumps(report)
+
+reviewer = build_reviewer_agent()
+print("🤖 Agent built successfully!")
+
+# Step 3: Run reviewer
+print("🧮 Running reviewer agent...")
+rev_res = reviewer.invoke({
+    "evidence": evidence_json,
+    "csv_path": "data/journal_entries.csv",
 })
 
-review = json.loads(review_result["output"])
-print(json.dumps(review, indent=2))
+rev_raw = rev_res["output"]
+print(rev_raw)
+
+# Step 4: Validate output
+rev = json.loads(rev_raw)
+assert set(rev) == {"reviewed_control_id", "period", "evidence_valid", "issues", "review_notes"}
+print("✅ Reviewer output shape OK")
+rev
 ```
 
 **✅ Checkpoint**:
@@ -558,59 +621,47 @@ print(json.dumps(review, indent=2))
 
 **Test Case 1: Valid Evidence**
 ```python
-# Use real Evidence Agent output
-evidence_agent = build_evidence_agent()
-evidence = evidence_agent.invoke({
-    "control_id": "PAY-002",
-    "period": "2024-07",
-    "csv_path": "data/journal_entries.csv"
-})
+# Test Case: Valid Evidence (from our earlier Evidence Agent run)
+print("✅ Test Case: Valid Evidence")
+print(f"Evidence valid: {rev['evidence_valid']}")
+print(f"Issues found: {rev['issues']}")
 
-reviewer_agent = build_reviewer_agent()
-review = reviewer_agent.invoke({
-    "control_id": "PAY-002",
-    "period": "2024-07",
-    "evidence_json": evidence["output"],
-    "csv_path": "data/journal_entries.csv"
-})
-
-review_payload = json.loads(review["output"])
-assert review_payload["evidence_valid"] == True
-assert len(review_payload["issues"]) == 0
-print("✅ Valid evidence passed review")
+assert rev['evidence_valid'] == True, "Valid evidence should pass review"
+assert len(rev['issues']) == 0, "Valid evidence should have no issues"
+print("✅ Valid evidence test PASSED\n")
 ```
 
 **Test Case 2: Invalid Evidence (Simulated Hallucination)**
 ```python
-# Simulate an Evidence Agent that hallucinated
+# Test Case 2: Invalid Evidence (simulated bad count)
+print("🔍 Test Case: Invalid Evidence")
 fake_evidence = json.dumps({
     "control_id": "PAY-002",
     "period": "2024-07",
     "violations_found": 5,  # Wrong! Should be 2
-    "violation_entries": ["1002", "1003", "9999"],  # Entry 9999 doesn't exist
+    "violation_entries": ["1002", "1003"],  # Count mismatch
     "policy_summary": "All payables over $1000 require dual approval.",
     "population": {"tested_count": 3, "criteria": "..."},
     "narrative": "Found 5 violations..."
 })
 
-reviewer_agent = build_reviewer_agent()
-review = reviewer_agent.invoke({
-    "control_id": "PAY-002",
-    "period": "2024-07",
-    "evidence_json": fake_evidence,
-    "csv_path": "data/journal_entries.csv"
+rev_res_bad = reviewer.invoke({
+    "evidence": fake_evidence,
+    "csv_path": "data/journal_entries.csv",
 })
 
-review_payload = json.loads(review["output"])
-assert review_payload["evidence_valid"] == False
-assert len(review_payload["issues"]) > 0
-print("✅ Invalid evidence caught by reviewer")
-print("Issues found:", review_payload["issues"])
+rev_bad = json.loads(rev_res_bad["output"])
+print(f"Evidence valid: {rev_bad['evidence_valid']}")
+print(f"Issues found: {rev_bad['issues']}")
+
+assert rev_bad['evidence_valid'] == False, "Invalid evidence should fail review"
+assert len(rev_bad['issues']) > 0, "Invalid evidence should have issues"
+print("✅ Invalid evidence test PASSED")
 ```
 
 **Expected Issues Detected**:
-- "Count mismatch: Recount found 2, evidence claims 5"
-- "Extra violations in evidence: ['9999']"
+- `"violations_found != len(violation_entries)"` (parity issue)
+- `"independent_recount=2 != evidence_count=5"` (count mismatch)
 
 ---
 
@@ -643,18 +694,18 @@ print("Issues found:", review_payload["issues"])
 - Add check: `if submitted_count != len(submitted_entries)`
 - This catches bugs in the Evidence Agent itself
 
-### Pitfall 3: Set Comparison Issues
-**Problem**: Comparison logic doesn't handle duplicates or ordering
+### Pitfall 3: Parameter Order Issues
+**Problem**: Calling `recount_and_compare` with wrong parameter order
 
 **Solution**:
 ```python
-# Convert to sets for proper comparison
-recount_entries = set(summary["entry_ids"])
-submitted_entries = set(evidence.get("violation_entries", []))
+# Correct order: csv_path first, then evidence_json
+result = recount_and_compare.invoke({
+    "csv_path": "data/journal_entries.csv",
+    "evidence_json": evidence_json
+})
 
-# Use set operations
-missing = recount_entries - submitted_entries
-extra = submitted_entries - recount_entries
+# NOT: evidence_json first (this is wrong)
 ```
 
 ### Pitfall 4: Not Testing with Invalid Evidence
@@ -675,8 +726,27 @@ extra = submitted_entries - recount_entries
 
 ---
 
+## Supporting Files
+
+### Updated `checks.py`
+The solution adds a new helper function for the reviewer:
+
+```python
+def count_pay002_violations_from_csv(csv_path: str, amount_threshold: float) -> int:
+    """Independent recount for PAY-002 given a CSV path."""
+    rows = load_logs(csv_path)
+    ap_over = filter_payables_over_threshold(rows, amount_threshold)
+    violations = find_dual_approval_violations(ap_over)
+    return len(violations)
+```
+
+This provides a focused recount function that the reviewer tool can call without repeating all the logic.
+
+---
+
 ## Deliverables
 
 * `sox_copilot/reviewer_agent.py` — The main agent orchestrator for review
 * `sox_copilot/tools.py` — Reviewer tools: `recount_and_compare`, `generate_review_notes`
-* Notebook section: Part 2 — Reviewer Agent demonstration
+* `sox_copilot/checks.py` — Updated with `count_pay002_violations_from_csv` helper function
+* Notebook section: Part 2 — Reviewer Agent demonstration (Cells 5-8)

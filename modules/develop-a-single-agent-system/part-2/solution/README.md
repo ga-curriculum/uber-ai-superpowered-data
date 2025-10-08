@@ -19,14 +19,14 @@
 
    ```bash
    pipenv shell
-   python -m ipykernel install --user --name soxlab-2 --display-name "Python (soxlab-2)"
+   python -m ipykernel install --user --name soxlab-1 --display-name "Python (soxlab-1)"
    ```
 
 4. **Select kernel in Cursor / Jupyter Notebook**
 
    * Open the notebook (`sox_copilot_lab.ipynb`).
    * Click **Select Kernel** in the top-right.
-   * Choose **Jupyter Kernel → Python (soxlab-2)**.
+   * Choose **Jupyter Kernel → Python (soxlab-1)**.
    * (If you don’t see it, hit the refresh button and look under “Jupyter Kernel.”)
 
 ---
@@ -78,8 +78,7 @@
 Once your environment is set up and the kernel is selected:
 
 1. Open `sox_copilot_lab.ipynb`
-2. Run cells 0-4 to build and test the Evidence Agent (from Part 1)
-3. Run cells 5-8 to build and test the Reviewer Agent (Part 2)
-4. The workflow demonstrates multi-agent interaction with independent validation
+2. Run cells sequentially from top to bottom
+3. The agent should automatically orchestrate tool calls and produce a structured JSON report
 
 See the parent directory's main README.md for detailed implementation guidance and architectural explanations.
