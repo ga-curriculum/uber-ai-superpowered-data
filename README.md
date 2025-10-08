@@ -58,10 +58,11 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 | Warm up Activities                   | -                  | 30 min             | Overview of day's lessons and content review                                   |
 | [Intro to LangChain and LangGraph](./modules/intro-to-langchain-and-langgraph-lesson) | Lecture/Workshop   | 90 min             | Apply LangGraph primitives to build auditable workflows with branching and classifiers. |
 | [Develop a Single-Agent System](./modules/develop-a-single-agent-system) | Lecture/Walkthrough| 120 min            | Design, assemble, and test a complete agent that meets requirements and design choices. |
+| [Prompt Engineering](./modules/prompt-engineering) | Lecture/Workshop   | 60 min             | Learn best practices for crafting effective prompts to guide LLM behavior and outputs. |
 | [Introduction to RAG](./modules/intro-to-rag-lesson) | Lecture/Walkthrough| 60 min             | Identify core components of a Retrieval-Augmented Generation system.           |
 | [Lab - Implementing RAG](./modules/lab-implementing-rag) | Lab                | 90 min             | Implement and evaluate RAG pipelines.                                          |
 | Lesson Wrap up                       | -                  | 30 min             | Module summary activities.                                                     |
-| **Total content**                    |                    | **7 total course hours** |                                                                                |
+| **Total content**                    |                    | **8 total course hours** |                                                                                |
 
 ### Day 3 - Orchestrating Multi-Agent Systems
 
@@ -99,4 +100,3 @@ Here is a consolidated list of all the labs in this course:
     *   [Lab - Build the Compliance Reviewer Agent](./modules/building-agent-2-and-initial-integration)
     *   [Lab - Upgrading to LangGraph](./modules/lab-orchestrating-and-evaluating-the-sox-copilot)
     *   [Lab — Refining the SOX Audit Copilot](./modules/lab-refining-the-sox-audit-copilot)
-'''
