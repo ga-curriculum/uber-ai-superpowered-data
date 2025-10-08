@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+langchain = "*"
+langchain-openai = "*"
+langgraph = "*"
+pandas = "*"
+langchain-core = "*"
+python-dotenv = "*"
+pydantic = "*"
+langchain-community = "*"
+faiss-cpu = "*"
+chromadb = "*"
+rank-bm25 = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
