@@ -1,7 +1,7 @@
 <h1>
   <span>
 
-  ![alt text](/assets/ga-logo.png)
+  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
 
   </span>
   <span class="subhead">Human Rubrics & Hybrid Evaluation</span>
@@ -133,6 +133,8 @@ Now both gates pass. ✅
 
 ### Implementation Pattern
 
+<!-- {% raw %} -->
+
 ```python
 def llm_judge(output: str, rubric: str) -> dict:
     """Use GPT-4 to evaluate an output against a rubric"""
@@ -160,6 +162,8 @@ Provide your evaluation in this format:
     return json.loads(judge_response)
 
 ```
+
+<!-- {% endraw %} -->
 
 ## Putting This in Your Pipeline
 

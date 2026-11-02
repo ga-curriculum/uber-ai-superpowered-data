@@ -1,7 +1,7 @@
 <h1>
   <span class="prefix">
 
-  ![](/assets/ga-logo.png)
+  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
 
   </span> 
   <span class="headline">Upgrading to LangGraph</span>

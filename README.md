@@ -19,7 +19,7 @@ To get started with this course, you'll need to have Python (version 3.11 or hig
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://git.generalassemb.ly/modular-curriculum-all-courses/uber-ai-superpowered-data.git
+    git clone https://github.com/ga-curriculum/uber-ai-superpowered-data.git
     ```
 2.  **Set up Python environment:**
     It's highly recommended to use a virtual environment to manage your Python dependencies.
