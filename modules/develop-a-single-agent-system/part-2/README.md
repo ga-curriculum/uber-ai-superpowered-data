@@ -2,7 +2,7 @@
 <h1>
   <span style="display:flex; gap:20px; text-align:middler; font-size:">
 
-  ![](/assets/ga-logo.png)
+  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
 
   </span> 
   <span class="headline">Observe and Evaluate Your Single-Agent System</span>
