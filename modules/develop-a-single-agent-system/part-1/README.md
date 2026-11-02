@@ -598,6 +598,9 @@ print(narrative)
 **File**: `sox_copilot/evidence_agent.py`
 
 **Implementation Pattern**:
+
+<!-- {% raw %} -->
+
 ```python
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor
@@ -657,6 +660,8 @@ def build_evidence_agent() -> AgentExecutor:
         verbose=True,                    # More verbose output for testing
     )
 ```
+
+<!-- {% endraw %} -->
 
 **Why this matters**:
 - The prompt provides explicit instructions for tool calling sequence

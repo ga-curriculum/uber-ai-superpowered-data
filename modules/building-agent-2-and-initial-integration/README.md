@@ -505,6 +505,9 @@ print(notes2)
 **File**: `sox_copilot/reviewer_agent.py`
 
 **Implementation Pattern**:
+
+<!-- {% raw %} -->
+
 ```python
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
@@ -562,6 +565,8 @@ def build_reviewer_agent() -> AgentExecutor:
         handle_parsing_errors=True,
     )
 ```
+
+<!-- {% endraw %} -->
 
 **Why this matters**:
 - **Multi-Agent Pattern**: Evidence Agent → Reviewer Agent (separation of duties)
