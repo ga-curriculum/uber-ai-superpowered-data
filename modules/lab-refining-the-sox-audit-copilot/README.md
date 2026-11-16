@@ -1,10 +1,7 @@
-<span>
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-</span>
-
-# Refining the SOX Copilot System
+<h1>
+  <span class="prefix"></span>
+  <span class="headline">Refining the SOX Copilot System</span>
+</h1>
 
 ## About This Section
 

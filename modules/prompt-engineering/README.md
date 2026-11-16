@@ -1,9 +1,5 @@
 <h1>
-  <span class="prefix">
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span> 
+  <span class="prefix"></span>
   <span class="headline">Prompt Design for Reliable Agents</span>
 </h1>
 

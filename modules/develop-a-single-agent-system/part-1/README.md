@@ -1,11 +1,7 @@
 
 <h1>
-  <span style="display:flex; gap:20px; text-align:middler; font-size:">
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span> 
   <span class="headline">Develop a Single-Agent System</span>
+  <span class="subhead">Part 1: Build the Evidence Agent</span>
 </h1>
 
 ## About

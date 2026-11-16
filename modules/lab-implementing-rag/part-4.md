@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span>
+  <span class="headline">RAG for AI Agents</span>
   <span class="subhead">Part 4 - Run, Log, and Reflect</span>
 </h1>
 

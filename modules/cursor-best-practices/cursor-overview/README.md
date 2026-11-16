@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span>
+  <span class="headline">Cursor Best Practices</span>
   <span class="subhead">Cursor Overview</span>
 </h1>
 

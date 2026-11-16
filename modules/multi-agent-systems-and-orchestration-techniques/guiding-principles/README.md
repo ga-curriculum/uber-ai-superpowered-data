@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span>
+  <span class="headline">Multi-Agent Systems and Orchestration Techniques</span>
   <span class="subhead">Guiding Principles for Reliable Multi-Agent Systems</span>
 </h1>
 

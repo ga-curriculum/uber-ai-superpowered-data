@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  <picture><img src="https://ga-curriculum.github.io/universal-resources-internal/ga-logos/ga-red-cog-128x128.png" alt="" height="48" align="absmiddle"></picture>
-
-  </span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
   <span class="subhead">Primitives & Concepts of LangChain</span>
 </h1>
 
