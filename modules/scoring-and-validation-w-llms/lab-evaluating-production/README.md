@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Scoring and Validation w/ LLMs</span>
   <span class="subhead">Applied Exercise - Scoring Real Outputs</span>
 </h1>
 

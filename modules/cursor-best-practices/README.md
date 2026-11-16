@@ -1,9 +1,5 @@
 <h1>
-  <span class="prefix">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
+  <span class="prefix"></span>
   <span class="headline">Cursor Best Practices</span>
 </h1>
 

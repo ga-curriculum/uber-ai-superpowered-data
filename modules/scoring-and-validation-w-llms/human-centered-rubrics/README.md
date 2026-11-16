@@ -1,11 +1,7 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Scoring and Validation w/ LLMs</span>
   <span class="subhead">Human Rubrics & Hybrid Evaluation</span>
-</h1
+</h1>
 
 **Learning objective:** Learn about human-centered approach to evaluation
 
@@ -133,6 +129,8 @@ Now both gates pass. ✅
 
 ### Implementation Pattern
 
+<!-- {% raw %} -->
+
 ```python
 def llm_judge(output: str, rubric: str) -> dict:
     """Use GPT-4 to evaluate an output against a rubric"""
@@ -160,6 +158,8 @@ Provide your evaluation in this format:
     return json.loads(judge_response)
 
 ```
+
+<!-- {% endraw %} -->
 
 ## Putting This in Your Pipeline
 

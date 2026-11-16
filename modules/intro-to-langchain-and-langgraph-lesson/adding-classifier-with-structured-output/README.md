@@ -1,9 +1,5 @@
 <h1>
-  <span>
-  
-  ![](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
   <span class="subhead">Tutorial Part 3: Adding a Classifier with Structured Output</span>
 </h1>
 

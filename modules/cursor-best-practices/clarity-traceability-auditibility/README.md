@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Cursor Best Practices</span>
   <span class="subhead">Clarity, Traceability, Auditability</span>
 </h1>
 

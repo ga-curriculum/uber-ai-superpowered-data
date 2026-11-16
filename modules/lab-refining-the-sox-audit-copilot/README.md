@@ -1,10 +1,7 @@
-<span>
-
-  ![alt text](/assets/ga-logo.png)
-
-</span>
-
-# Refining the SOX Copilot System
+<h1>
+  <span class="prefix"></span>
+  <span class="headline">Refining the SOX Copilot System</span>
+</h1>
 
 ## About This Section
 

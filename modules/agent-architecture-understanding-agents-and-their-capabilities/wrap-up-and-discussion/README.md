@@ -1,9 +1,5 @@
 <h1>
-  <span> 
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Agent Architecture: Understanding Agents and Their Capabilities</span>
   <span class="subhead">Why Structure Matters</span>
 </h1>
 

@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-  
-  </span>
+  <span class="headline">Mindset Shift: Deterministic vs. Probabilistic Systems</span>
   <span class="subhead">Hybrid Workflow Mindset</span>
 </h1>
 

@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Task Decomposition for AI Agents</span>
   <span class="subhead">Decomposition Framework & Case Study</span>
 </h1>
 

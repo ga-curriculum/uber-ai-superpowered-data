@@ -1,11 +1,7 @@
 
 <h1>
-  <span style="display:flex; gap:20px; text-align:middler; font-size:">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
-  <span class="headline">Observe and Evaluate Your Single-Agent System</span>
+  <span class="headline">Develop a Single-Agent System</span>
+  <span class="subhead">Part 2: Observe and Evaluate</span>
 </h1>
 
 ## About

@@ -1,11 +1,6 @@
 <h1>
-  <span class="prefix">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
-
-  <span class="headline">Intro to LangChain and LangGraph </span>
+  <span class="prefix"></span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
 </h1>
 
 ## About

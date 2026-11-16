@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](../assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
   <span class="subhead">Primitives & Concepts of LangChain</span>
 </h1>
 

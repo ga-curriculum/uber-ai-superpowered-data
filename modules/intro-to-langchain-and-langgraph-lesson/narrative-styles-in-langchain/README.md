@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
   <span class="subhead">Tutorial Part 1: Narrative Styles in LangChain</span>
 </h1>
 

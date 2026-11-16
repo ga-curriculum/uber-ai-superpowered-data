@@ -1,9 +1,5 @@
 <h1>
-  <span>
-  
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Multi-Agent Systems and Orchestration Techniques</span>
   <span class="subhead">Orchestration Patterns in Context</span>
 </h1>
 

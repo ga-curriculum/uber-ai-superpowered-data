@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">RAG for AI Agents</span>
   <span class="subhead">Part 3 - Add State and Guardrails with LangGraph</span>
 </h1>
 

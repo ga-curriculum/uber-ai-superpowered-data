@@ -1,9 +1,5 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">AI Compliance & Risk Management (SOX)</span>
   <span class="subhead">SOX Foundations & Where AI Fits</span>
 </h1>
 

@@ -1,11 +1,5 @@
 <h1>
-  <span>
-
-  ![](/assets/ga-logo.png)
-
-
-
-  </span>
+  <span class="headline">Intro to LangChain and LangGraph</span>
   <span class="subhead">Tutorial Part 2: Upgrading to LangGraph Router</span>
 </h1>
 

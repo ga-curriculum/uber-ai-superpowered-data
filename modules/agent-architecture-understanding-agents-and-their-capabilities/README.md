@@ -1,9 +1,5 @@
 <h1>
-  <span class="prefix">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
+  <span class="prefix"></span>
   <span class="headline">Agent Architecture: Understanding Agents and Their Capabilities</span>
 </h1>
 

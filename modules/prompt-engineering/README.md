@@ -1,9 +1,5 @@
 <h1>
-  <span class="prefix">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
+  <span class="prefix"></span>
   <span class="headline">Prompt Design for Reliable Agents</span>
 </h1>
 

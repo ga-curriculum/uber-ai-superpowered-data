@@ -1,9 +1,5 @@
 <h1>
-  <span>
-  
-  ![](/assets/ga-logo.png)
-
-  </span>
+  <span class="headline">Intro to RAG</span>
   <span class="subhead">Demo: RAG Walkthrough</span>
 </h1>
 

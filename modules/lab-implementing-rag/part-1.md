@@ -1,10 +1,6 @@
 <h1>
-  <span>
-
-  ![alt text](/assets/ga-logo.png)
-
-  </span>
-  <span class="subhead"> Part 1 - Prepare Documents and Build a Vector Store</span>
+  <span class="headline">RAG for AI Agents</span>
+  <span class="subhead">Part 1 - Prepare Documents and Build a Vector Store</span>
 </h1>
 
 

@@ -1,10 +1,5 @@
 <h1>
-   <span>
- 
-   ![alt text](/assets/ga-logo.png)
-   
-   </span>
-
+  <span class="prefix"></span>
   <span class="headline">Mindset Shift: Deterministic vs. Probabilistic Systems</span>
 </h1>
 

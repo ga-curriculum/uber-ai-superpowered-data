@@ -1,9 +1,5 @@
 <h1>
-  <span class="prefix">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
+  <span class="prefix"></span>
   <span class="headline">Develop a Single-Agent System</span>
 </h1>
 

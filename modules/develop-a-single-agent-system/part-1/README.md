@@ -1,11 +1,7 @@
 
 <h1>
-  <span style="display:flex; gap:20px; text-align:middler; font-size:">
-
-  ![](/assets/ga-logo.png)
-
-  </span> 
   <span class="headline">Develop a Single-Agent System</span>
+  <span class="subhead">Part 1: Build the Evidence Agent</span>
 </h1>
 
 ## About
@@ -598,6 +594,9 @@ print(narrative)
 **File**: `sox_copilot/evidence_agent.py`
 
 **Implementation Pattern**:
+
+<!-- {% raw %} -->
+
 ```python
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor
@@ -657,6 +656,8 @@ def build_evidence_agent() -> AgentExecutor:
         verbose=True,                    # More verbose output for testing
     )
 ```
+
+<!-- {% endraw %} -->
 
 **Why this matters**:
 - The prompt provides explicit instructions for tool calling sequence
